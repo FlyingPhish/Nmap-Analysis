@@ -3,6 +3,10 @@
 
 # Except
 !.gitignore
+!README.md
+!requirements.txt
+!images/
+!images/**
 !*.py
 !modules/
 !modules/**

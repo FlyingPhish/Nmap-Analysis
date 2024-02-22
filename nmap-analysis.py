@@ -240,7 +240,7 @@ if __name__ == "__main__":
             print("Invalid file paths provided for comparison.")
     elif args.command == 'gpt-report':
         if validate_file(args.gpt_nmap_file):
-            print("Passing given Nmap XML file to ChatGPT to create markdown report.")
+            print(f"Passing analysed stats for {args.gpt_nmap_file} to GPT to create .md report.")
             nmap_data = parse_nmap_xml(args.gpt_nmap_file)
             table = create_markdown_table(nmap_data)
 
