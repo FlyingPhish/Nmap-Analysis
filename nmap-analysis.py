@@ -7,8 +7,6 @@ from openai import OpenAI
 from datetime import datetime
 from typing import Dict, List, Tuple
 
-client = OpenAI(api_key=os.getenv("OPENAI_KEY"))
-
 def obligatory_banner():
     ascii_art = """
  ███▄    █  ███▄ ▄███▓ ▄▄▄       ██▓███      ▄▄▄      ███▄    █  ▄▄▄       ██▓   ▓██   ██▓  ██████  ██▓  ██████ 
@@ -190,7 +188,7 @@ def generate_gpt_report(nmap_data: Dict[str, List[Tuple[str, str]]], file_path: 
     if context:
         prompt += f"{context}\n\n"
     
-    response = client.completions.create(
+    response = openai_key.completions.create(
         prompt=prompt,
         model="gpt-3.5-turbo-instruct",
         temperature=0.7,
@@ -239,7 +237,9 @@ if __name__ == "__main__":
         else:
             print("Invalid file paths provided for comparison.")
     elif args.command == 'gpt-report':
-        if validate_file(args.gpt_nmap_file):
+        if validate_file(args.gpt_nmap_file) and os.getenv("OPENAI_KEY"):
+            openai_key = OpenAI(api_key=os.getenv("OPENAI_KEY"))
+
             print(f"Passing analysed stats for {args.gpt_nmap_file} to GPT to create .md report.")
             nmap_data = parse_nmap_xml(args.gpt_nmap_file)
             table = create_markdown_table(nmap_data)
@@ -250,6 +250,9 @@ if __name__ == "__main__":
             gpt_response = generate_gpt_report(nmap_data, args.gpt_nmap_file, args.context,stats_summary)
             create_markdown_report(gpt_response, table, stats_summary)
         else:
-            print(f"File {args.gpt_nmap_file} does not exist or is not a valid XML file.")
+            if not os.getenv("OPENAI_KEY"):
+                print("The OPENAI_KEY environment variable is not set. Please set the OPENAI_KEY with your OpenAI API key.")
+            else:
+                print(f"File {args.gpt_nmap_file} does not exist or is not a valid XML file.")
     else:
         parser.print_help()
