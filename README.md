@@ -34,6 +34,19 @@ This CLI python script is designed to be used by security consultants, IT admins
 - **GPT Report Generation**: Uses OpenAI's GPT to generate insightful analysis reports based on Nmap result stats. The tool uses a hardcoded prompt that sets the tone and requirements, then the script inserts the stats (no identifying information is provided) and if -c --context has been provided, it'll add the context to the bottom of the prompt.
 - **Customizable Context**: Enhance GPT analysis by providing additional context, tailoring the report to specific needs.
 
+## Usage
+The script prints the help page if no args are passed, or you can access with `python nmap-analysis.py -h`
+
+- **Comparing Nmap Scans**:
+```
+python nmap-analysis.py compare -ff (--first-nmap-file) path/to/first.xml -lf (--last-nmap-file) path/to/second.xml
+```
+
+**Generating a GPT Report**:
+``` 
+python nmap-analysis.py gpt-report -gf (--gpt-nmap-file) path/to/nmap.xml -c (--context) "Your optional context here"
+```
+
 ## Installation and Setup
 
 ### Prerequisites
@@ -79,25 +92,16 @@ pip install -r requirements.txt
 pipx install git+https://github.com/FlyingPhish/Nmap-Analysis.git
 ```
 
-## Usage
-The script prints the help page if no args are passed, or you can access with `python nmap-analysis.py -h`
+## License
 
-- **Comparing Nmap Scans**:
-```
-python nmap-analysis.py compare -ff (--first-nmap-file) path/to/first.xml -lf (--last-nmap-file) path/to/second.xml
-```
+This tool is licensed under the GNU Affero General Public License (AGPL). This licensing ensures that the software can be freely used, modified, and distributed for commercial purposes, under the condition that any modifications, extensions, or derivative works are also made available under the same AGPL license. This approach ensures that improvements and extensions contribute back to the community, fostering an open and collaborative development environment.
 
-**Generating a GPT Report**:
-``` 
-python nmap-analysis.py gpt-report --gpt-nmap-file path/to/nmap.xml --context "Your optional context here"
-```
+## Disclaimer
+
+The creators and contributors of the Nmap Analysis Tool provide this software "as is" and make no representations or warranties of any kind concerning the software, express, implied, statutory, or otherwise. This includes, without limitation, warranties of title, merchantability, fitness for a particular purpose, non-infringement, or the absence of latent or other defects, accuracy, or the presence or absence of errors, whether or not discoverable.
+
+Usage of the Nmap Analysis Tool is entirely at your own risk. The creators or contributors shall not be liable to you for damages of any kind related to the use or inability to use this software, including but not limited to direct, indirect, special, incidental, consequential, or punitive damages, even if they have been advised of the possibility of such damages.
 
 ## Contributing
 
 Contributions are welcome! Whether it's adding new features, fixing bugs, or improving documentation, feel free to fork the repository and submit pull requests.
-
-## License
-
-This tool is available under a custom license that permits commercial use but requires any modifications, extensions, or derivative works to be open-sourced and contributed back to the original project. This ensures that the community benefits from improvements and that the tool evolves in a transparent and collaborative manner.
-
-For detailed license terms, please see the LICENSE file in the repository.
