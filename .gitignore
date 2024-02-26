@@ -4,6 +4,7 @@
 # Except
 !.gitignore
 !README.md
+!LICENSE
 !requirements.txt
 !images/
 !images/**
