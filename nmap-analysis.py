@@ -1,11 +1,17 @@
+#!.venv/bin/python3
+
 import argparse
 import os
 import xml.etree.ElementTree as ET
+from dotenv import load_dotenv
 from openpyxl import Workbook
 from openpyxl.chart import PieChart, Reference
+from openpyxl.chart.label import DataLabelList
 from openai import OpenAI
 from datetime import datetime
 from typing import Dict, List, Tuple
+
+load_dotenv()
 
 def obligatory_banner():
     ascii_art = """
@@ -151,6 +157,8 @@ def generate_xlsx_report_final(data: List[Tuple[str, str, str, str, str, str]], 
     chart.add_data(data, titles_from_data=True)
     chart.set_categories(categories)
     chart.title = "Service Distribution"
+    chart.dataLabels = DataLabelList()
+    chart.dataLabels.showPercent = True  # Show percentages on the pie chart
 
     stats_sheet.add_chart(chart, f"E4")
     wb.save(output_file)
@@ -180,16 +188,19 @@ def format_stats_for_gpt(stats):
 def generate_gpt_report(nmap_data: Dict[str, List[Tuple[str, str]]], file_path: str, context: str, stats_summary) -> str:
     """Generate a report from GPT based on the Nmap XML file analysis."""
 
-    prompt = f"### Nmap Scan Analysis\n" \
-             f"You are a network security consultant that has been tasked with analysing the following open ports and services to create a report findings that will be added to a formal security report. Pay attention to ports and services that may be targeted by an attacker. Your response has to confirm with the following requirements: include a Description section that concisely describes the nature of open ports (do not hyperfocus on risk), include a Risk section that details the risk of identified ports and services, include a Remediation section from the perspective of IP allow/deny lists, monitoring and alerting safeguards and 'air gapping' if services are highly sensitive such as ICS/OT.\n" \
-             f"Identified ports and services below:\n" \
-             f"{stats_summary}\n\n"
+    system_prompt = f"### Nmap Scan Analysis\n" \
+             f"You are a network security consultant that has been tasked with analysing open ports and services provided by the user."
+
+    user_prompt = f"Create a markdown formatted report findings that will be added to a formal security report. Pay attention to ports and services that may be targeted by an attacker. Your response has to confirm with the following requirements: include a Description section that concisely describes the nature of open ports (do not hyperfocus on risk), include a Risk section that details the risk of identified ports and services, include a Remediation section from the perspective of IP allow/deny lists, monitoring and alerting safeguards and 'air gapping' if services are highly sensitive such as ICS/OT.\n" \
+    f"Identified ports and services below:\n{stats_summary}\n\n" 
 
     if context:
-        prompt += f"{context}\n\n"
+        user_prompt += f"Context: {context}\n\n"
     
+    full_prompt = system_prompt + user_prompt
+
     response = openai_key.completions.create(
-        prompt=prompt,
+        prompt=full_prompt,
         model="gpt-3.5-turbo-instruct",
         temperature=0.7,
         max_tokens=1500,
