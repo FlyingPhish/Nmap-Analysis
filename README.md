@@ -35,7 +35,7 @@ This CLI python script is designed to be used by security consultants, IT admins
 - **Customizable Context**: Enhance GPT analysis by providing additional context, tailoring the report to specific needs.
 
 ## Usage
-The script prints the help page if no args are passed, or you can access with `python nmap-analysis.py -h`
+The script prints the help page if no args are passed, or you can access with `python nmap-analysis.py -h`. Make sure to create an .env file that contains "OPENAI_KEY=x"
 
 - **Comparing Nmap Scans**:
 ```
