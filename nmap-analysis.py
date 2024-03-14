@@ -2,7 +2,9 @@
 
 import argparse
 import os
+import re
 import xml.etree.ElementTree as ET
+import subprocess
 from dotenv import load_dotenv
 from openpyxl import Workbook
 from openpyxl.chart import PieChart, Reference
@@ -210,11 +212,40 @@ def generate_gpt_report(nmap_data: Dict[str, List[Tuple[str, str]]], file_path: 
     )
     return response.choices[0].text
 
+def execute_fabric(stats_summary):
+    fabric_executable = None
+    inc_file_path = os.path.expanduser('~/.config/fabric/fabric-bootstrap.inc')
+
+    # Open and read the .inc file to find the alias for fabric
+    with open(inc_file_path, 'r', encoding='utf-8') as inc_file:
+        for line in inc_file:
+            # Looking for the line that starts with "alias fabric="
+            if line.startswith("alias fabric="):
+                # Extract the path using a regular expression. Adjusted to match your provided format
+                match = re.match(r"alias fabric='(.+)'", line)
+                if match:
+                    fabric_executable = match.group(1)
+                    break
+
+    if fabric_executable is None:
+        raise ValueError("Fabric executable path not found in .inc file")
+
+    command = [fabric_executable, "-p", "create_network_threat_landscape"]
+    
+    try:
+        # Execute the command without using shell=True for security
+        result = subprocess.run(command, input=stats_summary, text=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        print("Error executing command:", e.stderr)
+    
 def create_markdown_report(gpt_response: str, table: str, stats: str):
     """Write the GPT-generated analysis and the port/service table to a Markdown file."""
     filename = f"Nmap_Analysis_Report_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.md"
+
     with open(filename, "w") as file:
         file.write(gpt_response + "\n\n---\n\n" + "### Port/Service Stats\n\n" + stats + "\n\n---\n\n" + "### Detailed Port/Service Table\n\n" + table)
+
     print(f"Report generated: {filename}")
 
 if __name__ == "__main__":
@@ -232,6 +263,10 @@ if __name__ == "__main__":
     gpt_parser.add_argument('-gf', '--gpt-nmap-file', required=True, help='Target Nmap XML file for GPT analysis')
     gpt_parser.add_argument('-c', '--context', type=str, default="", help='Context that will be passed to GPT. For example, scans completed from an internal IP address to an internal network')
 
+    # fabric GPT report generation
+    gpt_parser = subparsers.add_parser('fabric-report', help="Use Daniel Miessler's Fabric software to generate an md report that includes description, risk, remediation, one sentence summary, trends, and quotes sections with a markdown table that shows IPs, ports and services")
+    gpt_parser.add_argument('-gf', '--gpt-nmap-file', required=True, help='Target Nmap XML file for GPT analysis')
+
     args = parser.parse_args()
     
     if args.command == 'compare':
@@ -247,6 +282,7 @@ if __name__ == "__main__":
             print("Comparison spreadsheet generated.")
         else:
             print("Invalid file paths provided for comparison.")
+
     elif args.command == 'gpt-report':
         if validate_file(args.gpt_nmap_file) and os.getenv("OPENAI_KEY"):
             openai_key = OpenAI(api_key=os.getenv("OPENAI_KEY"))
@@ -260,6 +296,20 @@ if __name__ == "__main__":
 
             gpt_response = generate_gpt_report(nmap_data, args.gpt_nmap_file, args.context,stats_summary)
             create_markdown_report(gpt_response, table, stats_summary)
+
+    elif args.command == 'fabric-report':
+        if validate_file(args.gpt_nmap_file):
+            print(f"Function disabled until pull request is merged.")
+            # print(f"Passing analysed stats for {args.gpt_nmap_file} to Fabric to create .md report using pattern create_network_threat_landscape")
+            # nmap_data = parse_nmap_xml(args.gpt_nmap_file)
+            # table = create_markdown_table(nmap_data)
+
+            # stats = calculate_statistics(nmap_data)
+            # stats_summary = format_stats_for_gpt(stats)
+
+            # fabric_response = execute_fabric(stats_summary)
+            # create_markdown_report(fabric_response, table, stats_summary)
+
         else:
             if not os.getenv("OPENAI_KEY"):
                 print("The OPENAI_KEY environment variable is not set. Please set the OPENAI_KEY with your OpenAI API key.")

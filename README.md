@@ -1,16 +1,23 @@
 # Nmap Analysis Tool
 
-This CLI python script is designed to be used by security consultants, IT admins and network engineers to do two things, compare two Nmap XML files to create a spreadsheet that compares IPs, ports and services between the files, and create a markdown report using GPT.
+This CLI python script is designed to be used by security consultants, IT admins and network engineers to do two things, compare two Nmap XML files to create a spreadsheet that compares IPs, ports and services between the files, and create a markdown report using GPT via OpenAI directly or [Daniel Miessler's Fabric tool](https://github.com/danielmiessler/fabric/tree/main).
 
 ## Screenshots
-
+### Introduction:
 ![Introduction](images/tool.png)
 
+### Spreadsheet:
 ![Snippet of Spreadsheet](images/spreadsheet.png)
 
+### Spreadsheet Pie Chart:
 ![Spreadsheet Pie Chart](images/spreadsheet-pie.png)
 
+### Sample GPT Report:
 ![Sample GPT Report](images/gpt-report.png)
+
+### Sample AI Report via Fabric:
+![Sample Fabric Report](images/fabric-created-report.png)
+
 ---
 ## Features
 
@@ -34,6 +41,10 @@ This CLI python script is designed to be used by security consultants, IT admins
 - **GPT Report Generation**: Uses OpenAI's GPT to generate insightful analysis reports based on Nmap result stats. The tool uses a hardcoded prompt that sets the tone and requirements, then the script inserts the stats (no identifying information is provided) and if -c --context has been provided, it'll add the context to the bottom of the prompt.
 - **Customizable Context**: Enhance GPT analysis by providing additional context, tailoring the report to specific needs.
 
+### AI-Powered Insights with Fabric
+_This function has been implemented but disabled until the pull request is merged. Feel free to uncomment the code if you have manually added the `create_network_threat_landscape` pattern_
+- **Fabric Report Generation**: Uses Fabric to generate insightful analysis reports based on Nmap result stats. The tool uses a hardcoded system prompt (pattern) that sets the tone and requirements, then the script inserts the stats (no identifying information is provided). I prefer the output created by Fabric over GPT.
+
 ## Usage
 The script prints the help page if no args are passed, or you can access with `python nmap-analysis.py -h`. Make sure to create an .env file that contains "OPENAI_KEY=x"
 
@@ -47,12 +58,17 @@ python nmap-analysis.py compare -ff (--first-nmap-file) path/to/first.xml -lf (-
 python nmap-analysis.py gpt-report -gf (--gpt-nmap-file) path/to/nmap.xml -c (--context) "Your optional context here"
 ```
 
+**Generating a AI Report via Fabric (uses your chosen model and vendor)**:
+``` 
+python nmap-analysis.py fabric-report -gf (--gpt-nmap-file) path/to/nmap.xml
+```
 ## Installation and Setup
 
 ### Prerequisites
 
 - 3.10+ probably (created using 3.12)
 - An OpenAI API key for GPT report generation that is set in local env
+- Install and configure [Fabric](https://github.com/danielmiessler/fabric/tree/main)
 
 ### Secure Installation with `venv`
 
