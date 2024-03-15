@@ -42,7 +42,6 @@ This CLI python script is designed to be used by security consultants, IT admins
 - **Customizable Context**: Enhance GPT analysis by providing additional context, tailoring the report to specific needs.
 
 ### AI-Powered Insights with Fabric
-_This function has been implemented but disabled until the pull request is merged. Feel free to uncomment the code if you have manually added the `create_network_threat_landscape` pattern_
 - **Fabric Report Generation**: Uses Fabric to generate insightful analysis reports based on Nmap result stats. The tool uses a hardcoded system prompt (pattern) that sets the tone and requirements, then the script inserts the stats (no identifying information is provided). I prefer the output created by Fabric over GPT.
 
 ## Usage
