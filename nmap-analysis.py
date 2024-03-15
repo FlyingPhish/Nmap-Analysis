@@ -299,16 +299,15 @@ if __name__ == "__main__":
 
     elif args.command == 'fabric-report':
         if validate_file(args.gpt_nmap_file):
-            print(f"Function disabled until pull request is merged.")
-            # print(f"Passing analysed stats for {args.gpt_nmap_file} to Fabric to create .md report using pattern create_network_threat_landscape")
-            # nmap_data = parse_nmap_xml(args.gpt_nmap_file)
-            # table = create_markdown_table(nmap_data)
+            print(f"Passing analysed stats for {args.gpt_nmap_file} to Fabric to create .md report using pattern create_network_threat_landscape")
+            nmap_data = parse_nmap_xml(args.gpt_nmap_file)
+            table = create_markdown_table(nmap_data)
 
-            # stats = calculate_statistics(nmap_data)
-            # stats_summary = format_stats_for_gpt(stats)
+            stats = calculate_statistics(nmap_data)
+            stats_summary = format_stats_for_gpt(stats)
 
-            # fabric_response = execute_fabric(stats_summary)
-            # create_markdown_report(fabric_response, table, stats_summary)
+            fabric_response = execute_fabric(stats_summary)
+            create_markdown_report(fabric_response, table, stats_summary)
 
         else:
             if not os.getenv("OPENAI_KEY"):
