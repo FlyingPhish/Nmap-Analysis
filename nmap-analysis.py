@@ -203,9 +203,9 @@ def generate_gpt_report(nmap_data: Dict[str, List[Tuple[str, str]]], file_path: 
 
     response = openai_key.completions.create(
         prompt=full_prompt,
-        model="gpt-3.5-turbo-instruct",
+        model="gpt-4o-2024-08-06",
         temperature=0.7,
-        max_tokens=1500,
+        max_tokens=16000,
         top_p=1.0,
         frequency_penalty=0.0,
         presence_penalty=0.0
@@ -213,24 +213,7 @@ def generate_gpt_report(nmap_data: Dict[str, List[Tuple[str, str]]], file_path: 
     return response.choices[0].text
 
 def execute_fabric(stats_summary):
-    fabric_executable = None
-    inc_file_path = os.path.expanduser('~/.config/fabric/fabric-bootstrap.inc')
-
-    # Open and read the .inc file to find the alias for fabric
-    with open(inc_file_path, 'r', encoding='utf-8') as inc_file:
-        for line in inc_file:
-            # Looking for the line that starts with "alias fabric="
-            if line.startswith("alias fabric="):
-                # Extract the path using a regular expression. Adjusted to match your provided format
-                match = re.match(r"alias fabric='(.+)'", line)
-                if match:
-                    fabric_executable = match.group(1)
-                    break
-
-    if fabric_executable is None:
-        raise ValueError("Fabric executable path not found in .inc file")
-
-    command = [fabric_executable, "-p", "create_network_threat_landscape"]
+    command = ["fabric", "-p", "create_network_threat_landscape"]
     
     try:
         # Execute the command without using shell=True for security
